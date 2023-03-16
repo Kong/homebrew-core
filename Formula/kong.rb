@@ -53,29 +53,29 @@ class Kong < Formula
   depends_on "coreutils" => :build
   depends_on "zlib" => :build
 
+  depends_on "luarocks"
+
   def install
     system "HOME=/tmp/brew_home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH bazel build //build:kong --action_env=HOME --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
-
+    prefix.install Dir["bazel-bin/external/openssl/openssl"]
     prefix.install "kong/include"
     bin.install "bin/kong"
 
-    prefix = Formula["kong"].prefix
+    kong_prefix = Formula["kong"].prefix
 
-    luarocks_prefix = prefix + "luarocks"
     openssl_prefix = prefix + "openssl"
-    openresty_prefix = prefix + "openresty"
+    openresty_prefix = kong_prefix + "openresty"
 
     bin.install_symlink "#{openresty_prefix}/nginx/sbin/nginx"
     bin.install_symlink "#{openresty_prefix}/bin/openresty"
     bin.install_symlink "#{openresty_prefix}/bin/resty"
-    bin.install_symlink "#{luarocks_prefix}/bin/luarocks"    
 
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
 
-    system "#{luarocks_prefix}/bin/luarocks",
+    system "luarocks",
            "--tree=#{prefix}",
            "make",
            "CRYPTO_DIR=#{openssl_prefix}",
