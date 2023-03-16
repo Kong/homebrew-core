@@ -1,6 +1,7 @@
 class Kong < Formula
   desc "Open source Microservices and API Gateway"
   homepage "https://docs.konghq.com"
+  license "Apache License Version 2.0"
 
   KONG_VERSION = "3.2.1".freeze
   
@@ -17,7 +18,25 @@ class Kong < Formula
 
   patch :DATA
 
-  license "Apache License Version 2.0"
+  # this allows .proto files to be sourced from kong's homebrew prefix when
+  # combined with include.install below (trace_service.proto, etc.)
+  #
+  # can be removed once our luarocks supplying thier own proto files:
+  #   https://github.com/Kong/kong/pull/8918
+  patch :p1, <<-PATCH.gsub(/^\s{2}/, "")
+    diff --git a/kong/tools/grpc.lua b/kong/tools/grpc.lua
+    index 7ed532a..cd23571 100644
+    --- a/kong/tools/grpc.lua
+    +++ b/kong/tools/grpc.lua
+    @@ -72,6 +72,7 @@ function _M.new()
+         "/usr/include",
+         "kong/include",
+         "spec/fixtures/grpc",
+    +    "HOMEBREW_PREFIX/Cellar/kong/#{KONG_VERSION}/include",
+       } do
+         protoc_instance:addpath(v)
+       end
+  PATCH
 
   depends_on "openjdk" => :build
   depends_on "bazelisk" => :build
@@ -36,7 +55,33 @@ class Kong < Formula
 
   def install
     system "HOME=/tmp/brew_home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH bazel build //build:kong --action_env=HOME --verbose_failures"
+
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
+
+    prefix.install "kong/include"
+    bin.install "bin/kong"
+
+    prefix = Formula["kong"].prefix
+
+    luarocks_prefix = prefix + "luarocks"
+    openssl_prefix = prefix + "openssl"
+
+    bin.install_symlink "#{openresty_prefix}/openresty/nginx/sbin/nginx"
+    bin.install_symlink "#{openresty_prefix}/openresty/bin/openresty"
+    bin.install_symlink "#{openresty_prefix}/openresty/bin/resty"
+    bin.install_symlink "#{luarocks_prefix}/bin/luarocks"    
+
+    yaml_libdir = Formula["libyaml"].opt_lib
+    yaml_incdir = Formula["libyaml"].opt_include
+
+    system "#{luarocks_prefix}/bin/luarocks",
+           "--tree=#{prefix}",
+           "make",
+           "CRYPTO_DIR=#{openssl_prefix}",
+           "OPENSSL_DIR=#{openssl_prefix}",
+           "YAML_LIBDIR=#{yaml_libdir}",
+           "YAML_INCDIR=#{yaml_incdir}"
+
   end
 
   test do
