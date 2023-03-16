@@ -35,7 +35,7 @@ class Kong < Formula
   depends_on "zlib" => :build
 
   def install
-    system "bazel build //build:kong"
+    system "PATH=$(brew --prefix python)/libexec/bin:$PATH bazel build //build:kong"
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
   end
 
