@@ -65,10 +65,11 @@ class Kong < Formula
 
     luarocks_prefix = prefix + "luarocks"
     openssl_prefix = prefix + "openssl"
+    openresty_prefix = prefix + "openresty"
 
-    bin.install_symlink "#{openresty_prefix}/openresty/nginx/sbin/nginx"
-    bin.install_symlink "#{openresty_prefix}/openresty/bin/openresty"
-    bin.install_symlink "#{openresty_prefix}/openresty/bin/resty"
+    bin.install_symlink "#{openresty_prefix}/nginx/sbin/nginx"
+    bin.install_symlink "#{openresty_prefix}/bin/openresty"
+    bin.install_symlink "#{openresty_prefix}/bin/resty"
     bin.install_symlink "#{luarocks_prefix}/bin/luarocks"    
 
     yaml_libdir = Formula["libyaml"].opt_lib
