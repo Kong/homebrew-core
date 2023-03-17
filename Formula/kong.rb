@@ -56,10 +56,10 @@ class Kong < Formula
   def install
 
     tmpdir = "/var/tmp/kong-build.%f.%i" % [rand(), Time.now.to_i]
-    BAZEL = "bazel --output_user_root=#{tmpdir}/bazel"
+    bazel = "bazel --output_user_root=#{tmpdir}/bazel"
 
     # Build kong, carefully setting the environment so that brew and bazel cooperate
-    system "HOME=${tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{BAZEL} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
+    system "HOME=${tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
@@ -85,8 +85,8 @@ class Kong < Formula
            "YAML_LIBDIR=#{yaml_libdir}",
            "YAML_INCDIR=#{yaml_incdir}"
 
-    system "#{BAZEL} --output_user_root=#{tmpdir}/bazel clean --expunge"
-    system "#{BAZEL} shutdown"
+    system "#{bazel} --output_user_root=#{tmpdir}/bazel clean --expunge"
+    system "#{bazel} shutdown"
     system "chmod", "-R", "u+w", "#{tmpdir}"
     system "rm -rf #{tmpdir}"
   end
