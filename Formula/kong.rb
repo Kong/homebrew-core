@@ -32,7 +32,7 @@ class Kong < Formula
          "/usr/include",
          "kong/include",
          "spec/fixtures/grpc",
-    +    "HOMEBREW_PREFIX/Cellar/kong/#{KONG_VERSION}/include",
+    +    "HOMEBREW_FORMULA_PREFIX/include",
        } do
          protoc_instance:addpath(v)
        end
@@ -75,7 +75,7 @@ class Kong < Formula
     yaml_incdir = Formula["libyaml"].opt_include
 
     system "${kong_prefix}/bin/luarocks",
-           "--tree=#{prefix}",
+           "--tree=#{kong_prefix}",
            "make",
            "CRYPTO_DIR=#{openssl_prefix}",
            "OPENSSL_DIR=#{openssl_prefix}",
