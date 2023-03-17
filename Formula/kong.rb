@@ -65,7 +65,7 @@ class Kong < Formula
 
     prefix.install Dir["bazel-bin/external/luarocks/luarocks_tree"]
     system "mv", "#{prefix}/luarocks_tree", "#{prefix}/luarocks"
-    bin.install_symlink Dir["#{prefix}/luarocks/bin/*"]
+    bin.install_symlink "#{prefix}/luarocks/bin/luarocks"
     
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl"]
@@ -74,7 +74,7 @@ class Kong < Formula
 
     lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
     lib.install Dir["bazel-bin/external/openresty/luajit/lib/*.dylib"]
-    include.install "kong/include/protobuf"
+    include.install "kong/include/opentelemetry"
     bin.install "bin/kong"
 
     raise "hell"
