@@ -61,15 +61,20 @@ class Kong < Formula
     # Build kong, carefully setting the environment so that brew and bazel cooperate
     system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
+    prefix.install Dir["bazel-bin/build/kong-dev/*"]
+
     prefix.install Dir["bazel-bin/external/luarocks/luarocks_tree"]
+    system "mv", "#{prefix}/luarocks_tree", "#{prefix}/luarocks"
+    bin.install_symlink Dir["#{prefix}/luarocks/bin/*"]
     
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl"]
+    bin.install_symlink Dir["#{prefix}/openssl/bin/*"]
+    include.install "#{prefix}/openssl/include/openssl"
 
-    prefix.install Dir["bazel-bin/build/kong-dev/*"]
     lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
     lib.install Dir["bazel-bin/external/openresty/luajit/lib/*.dylib"]
-    prefix.install "kong/include"
+    include.install "kong/include/protobuf"
     bin.install "bin/kong"
 
     raise "hell"
