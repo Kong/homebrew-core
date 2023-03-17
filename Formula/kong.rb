@@ -58,7 +58,9 @@ class Kong < Formula
   def install
     system "HOME=/tmp/brew_home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH bazel build //build:kong --action_env=HOME --verbose_failures"
 
+
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
+    system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl/*"]
     prefix.install Dir["bazel-bin/external/luarocks/luarocks_tree/*"]
     prefix.install "kong/include"
