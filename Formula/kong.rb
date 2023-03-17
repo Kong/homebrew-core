@@ -64,7 +64,7 @@ class Kong < Formula
     prefix.install Dir["bazel-bin/external/luarocks/luarocks_tree/*"]
     
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
-    prefix.install Dir["bazel-bin/external/openssl/openssl"]
+    prefix.install Dir["bazel-bin/external/openssl/openssl/*"]
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
