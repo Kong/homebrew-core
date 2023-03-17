@@ -68,8 +68,6 @@ class Kong < Formula
     bin.install_symlink "#{prefix}/openresty/bin/resty"
     bin.install_symlink "#{prefix}/openresty/nginx/sbin/nginx"
 
-    raise "hell"
-
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
 
