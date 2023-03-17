@@ -61,24 +61,22 @@ class Kong < Formula
     # Build kong, carefully setting the environment so that brew and bazel cooperate
     system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
-    bin.install "bazel-bin/build/kong-dev/openresty/nginx/sbin/nginx"
-    bin.install Dir["bazel-bin/external/luarocks/luarocks_tree/bin/*"]
-    lib.install Dir["bazel-bin/external/luarocks/luarocks_tree/lib/*"]
-    prefix.install Dir["bazel-bin/build/kong-dev/*"]
+    prefix.install Dir["bazel-bin/external/luarocks/luarocks_tree/*"]
+    system "mv", "#{prefix}/luarocks_tree", "#{prefix}/luarocks"
+    prefix.install_symlink "#{prefix}/luarocks/bin/luarocks"
+    
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl"]
+
+    prefix.install Dir["bazel-bin/build/kong-dev/*"]
     lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
     lib.install Dir["bazel-bin/external/openresty/luajit/lib/*.dylib"]
     prefix.install "kong/include"
     bin.install "bin/kong"
 
-    openssl_prefix = prefix + "openssl/"
-    openresty_prefix = prefix + "openresty"
-
-    bin.install_symlink "#{openresty_prefix}/bin/openresty"
-    bin.install_symlink "#{openresty_prefix}/bin/resty"
-
-    raise "hell"
+    bin.install_symlink "#{prefix}/openresty/nginx/sbin/nginx"
+    bin.install_symlink "#{prefix}/openresty/bin/openresty"
+    bin.install_symlink "#{prefix}/openresty/bin/resty"
 
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
@@ -86,10 +84,12 @@ class Kong < Formula
     system "#{prefix}/bin/luarocks",
            "--tree=#{prefix}",
            "make",
-           "CRYPTO_DIR=#{openssl_prefix}",
-           "OPENSSL_DIR=#{openssl_prefix}",
+           "CRYPTO_DIR=#{prefix}/openssl",
+           "OPENSSL_DIR=#{prefix}/openssl",
            "YAML_LIBDIR=#{yaml_libdir}",
            "YAML_INCDIR=#{yaml_incdir}"
+
+    raise "hell"
 
     system "#{bazel} --output_user_root=#{tmpdir}/bazel clean --expunge"
     system "#{bazel} shutdown"
