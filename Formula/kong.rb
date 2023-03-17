@@ -32,7 +32,7 @@ class Kong < Formula
          "/usr/include",
          "kong/include",
          "spec/fixtures/grpc",
-    +    "HOMEBREW_FORMULA_PREFIX/include",
+    +    "HOMEBREW_PREFIX/Cellar/kong/#{KONG_VERSION}/include",
        } do
          protoc_instance:addpath(v)
        end
@@ -54,9 +54,8 @@ class Kong < Formula
   depends_on "zlib" => :build
 
   def install
-    kong_prefix = Formula["kong"].prefix
 
-    system "HOME=/tmp/brew_home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH bazel build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{kong_prefix} --verbose_failures"
+    system "HOME=/tmp/brew_home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH bazel build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
@@ -64,8 +63,8 @@ class Kong < Formula
     prefix.install "kong/include"
     bin.install "bin/kong"
 
-    openssl_prefix = kong_prefix + "openssl/"
-    openresty_prefix = kong_prefix + "openresty"
+    openssl_prefix = prefix + "openssl/"
+    openresty_prefix = prefix + "openresty"
 
     bin.install_symlink "#{openresty_prefix}/nginx/sbin/nginx"
     bin.install_symlink "#{openresty_prefix}/bin/openresty"
@@ -74,8 +73,8 @@ class Kong < Formula
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
 
-    system "${kong_prefix}/bin/luarocks",
-           "--tree=#{kong_prefix}",
+    system "#{prefix}/bin/luarocks",
+           "--tree=#{prefix}",
            "make",
            "CRYPTO_DIR=#{openssl_prefix}",
            "OPENSSL_DIR=#{openssl_prefix}",
@@ -85,16 +84,30 @@ class Kong < Formula
   end
 
   test do
-    # `test do` will create, run in and delete a temporary directory.
-    #
-    # This test will fail and we won't accept that! For Homebrew/homebrew-core
-    # this will need to be a test that verifies the functionality of the
-    # software. Run the test with `brew test kong`. Options passed
-    # to `brew install` such as `--HEAD` also need to be provided to `brew test`.
-    #
-    # The installed folder is not in the path, so use the entire path to any
-    # executables being tested: `system "#{bin}/program", "do", "something"`.
-    system "false"
+    # attempt to load .proto files using code patched above
+    # "setmetatable" is required to quiet a warning
+    ENV["LUA_PATH"] = [
+      "#{share}/lua/5.1/?.lua;",
+    ].join
+
+    ENV["LUA_CPATH"] = [
+      "#{lib}/lua/5.1/?.so",
+    ].join
+
+    system(
+      "#{bin}/resty", \
+      "-e", \
+      <<~SCRIPT.gsub(/(^\s{6})|\n/, ""),
+        require('luarocks.loader');
+        setmetatable(_G,nil);
+        require('kong.plugins.opentelemetry.proto')
+      SCRIPT
+    )
+
+    tempfile = `gmktemp --dry-run`
+    system "#{bin}/kong version -vv 2>&1 | grep 'Kong:'"
+    system "kong", "config", "init", tempfile
+    system "kong", "check", tempfile
   end
 end
 
