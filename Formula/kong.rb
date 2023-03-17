@@ -81,6 +81,7 @@ class Kong < Formula
            "YAML_LIBDIR=#{yaml_libdir}",
            "YAML_INCDIR=#{yaml_incdir}"
 
+    system "bazel clean --expunge"
   end
 
   test do
