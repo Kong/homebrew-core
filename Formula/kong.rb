@@ -62,14 +62,12 @@ class Kong < Formula
     system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
-    system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
-    prefix.install Dir["bazel-bin/external/openssl/openssl"]
     include.install "kong/include/opentelemetry"
-    bin.install "bin/kong"
 
-    lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
-    lib.install Dir["bazel-bin/external/openresty/luajit/lib/*.dylib"]
-    lib.install_symlink Dir["#{prefix}/openssl/lib/*.dylib"]
+    bin.install "bin/kong"
+    bin.install_symlink "#{prefix}/openresty/bin/resty"
+    bin.install_symlink "#{prefix}/openresty/nginx/sbin/nginx"
+    
     raise "hell"
 
     yaml_libdir = Formula["libyaml"].opt_lib
