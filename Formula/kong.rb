@@ -56,7 +56,7 @@ class Kong < Formula
   def install
     kong_prefix = Formula["kong"].prefix
 
-    system "PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH bazel build //build:kong --action_env=HOME=/tmp/brew_home --action_env=INSTALL_DESTDIR=#{kong_prefix} --verbose_failures"
+    system "HOME=/tmp/brew_home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH bazel build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{kong_prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
