@@ -62,6 +62,7 @@ class Kong < Formula
     system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --action_env=DYLD_LIBRARY_PATH=#{prefix} --verbose_failures"
 
     bin.install "bazel-bin/build/kong-dev/openresty/nginx/sbin/nginx"
+    bin.install Dir["bazel-bin/external/luarocks/luarocks_tree/bin/luarocks"]
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl"]
