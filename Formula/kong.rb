@@ -61,12 +61,12 @@ class Kong < Formula
     # Build kong, carefully setting the environment so that brew and bazel cooperate
     system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build --config=release //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
-    bin.install "bazel-bin/build/kong-dev/openresty/nginx/sbin/nginx"
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     include.install "kong/include/opentelemetry"
 
     bin.install "bin/kong"
     bin.install_symlink "#{prefix}/openresty/bin/resty"
+    bin.install "#{prefix}/openresty/nginx/sbin/nginx"
 
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
