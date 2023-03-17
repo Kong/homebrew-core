@@ -59,7 +59,7 @@ class Kong < Formula
     bazel = "bazel --output_user_root=#{tmpdir}/bazel"
 
     # Build kong, carefully setting the environment so that brew and bazel cooperate
-    system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
+    system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     include.install "kong/include/opentelemetry"
@@ -67,7 +67,7 @@ class Kong < Formula
     bin.install "bin/kong"
     bin.install_symlink "#{prefix}/openresty/bin/resty"
     bin.install_symlink "#{prefix}/openresty/nginx/sbin/nginx"
-    
+
     raise "hell"
 
     yaml_libdir = Formula["libyaml"].opt_lib
@@ -80,7 +80,6 @@ class Kong < Formula
            "OPENSSL_DIR=#{prefix}/openssl",
            "YAML_LIBDIR=#{yaml_libdir}",
            "YAML_INCDIR=#{yaml_incdir}"
-
 
     system "#{bazel} --output_user_root=#{tmpdir}/bazel clean --expunge"
     system "#{bazel} shutdown"
