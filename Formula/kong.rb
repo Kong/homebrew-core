@@ -66,7 +66,7 @@ class Kong < Formula
 
     bin.install "bin/kong"
     bin.install_symlink "#{prefix}/openresty/bin/resty"
-    bin.install "#{prefix}/openresty/nginx/sbin/nginx"
+    bin.install_symlink "#{prefix}/openresty/nginx/sbin/nginx"
 
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
