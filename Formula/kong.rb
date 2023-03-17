@@ -87,6 +87,7 @@ class Kong < Formula
 
     system "#{BAZEL} --output_user_root=#{tmpdir}/bazel clean --expunge"
     system "#{BAZEL} shutdown"
+    system "chmod", "-R", "u+w", "#{tmpdir}"
     system "rm -rf #{tmpdir}"
   end
 
