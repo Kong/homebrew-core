@@ -62,8 +62,6 @@ class Kong < Formula
     system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/external/luarocks/luarocks_tree/*"]
-    system "mv", "#{prefix}/luarocks_tree", "#{prefix}/luarocks"
-    prefix.install_symlink "#{prefix}/luarocks/bin/luarocks"
     
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl"]
