@@ -75,9 +75,10 @@ class Kong < Formula
     openssl_prefix = prefix + "openssl/"
     openresty_prefix = prefix + "openresty"
 
-    bin.install_symlink "#{openresty_prefix}/nginx/sbin/nginx"
     bin.install_symlink "#{openresty_prefix}/bin/openresty"
     bin.install_symlink "#{openresty_prefix}/bin/resty"
+
+    raise "hell"
 
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
