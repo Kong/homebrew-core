@@ -64,6 +64,8 @@ class Kong < Formula
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl"]
+    lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
+    lib.install Dir["bazel-bin/external/openresty/luajit/lib/*.dylib"]
     prefix.install "kong/include"
     bin.install "bin/kong"
 
