@@ -82,6 +82,7 @@ class Kong < Formula
            "YAML_INCDIR=#{yaml_incdir}"
 
     system "bazel clean --expunge"
+    system "rm -rf $(bazel info repository_cache)"
     system "bazel shutdown"
   end
 
