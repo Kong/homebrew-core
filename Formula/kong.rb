@@ -59,7 +59,7 @@ class Kong < Formula
     bazel = "bazel --output_user_root=#{tmpdir}/bazel"
 
     # Build kong, carefully setting the environment so that brew and bazel cooperate
-    system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
+    system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build --config=release //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
     include.install "kong/include/opentelemetry"
