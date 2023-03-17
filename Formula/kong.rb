@@ -62,26 +62,15 @@ class Kong < Formula
     system "HOME=#{tmpdir}/home PATH=$(brew --prefix python)/libexec/bin:/usr/bin:$PATH #{bazel} build //build:kong --action_env=HOME --action_env=INSTALL_DESTDIR=#{prefix} --verbose_failures"
 
     prefix.install Dir["bazel-bin/build/kong-dev/*"]
-
-    prefix.install Dir["bazel-bin/external/luarocks/luarocks_tree"]
-    system "mv", "#{prefix}/luarocks_tree", "#{prefix}/luarocks"
-    bin.install_symlink "#{prefix}/luarocks/bin/luarocks"
-    
     system "chmod", "-R", "u+w", "bazel-bin/external/openssl"
     prefix.install Dir["bazel-bin/external/openssl/openssl"]
-    bin.install_symlink Dir["#{prefix}/openssl/bin/*"]
-    include.install "#{prefix}/openssl/include/openssl"
-
-    lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
-    lib.install Dir["bazel-bin/external/openresty/luajit/lib/*.dylib"]
     include.install "kong/include/opentelemetry"
     bin.install "bin/kong"
 
+    lib.install "bazel-bin/external/atc_router/libatc_router.dylib"
+    lib.install Dir["bazel-bin/external/openresty/luajit/lib/*.dylib"]
+    lib.install_symlink Dir["#{prefix}/openssl/lib/*.dylib"]
     raise "hell"
-
-    bin.install_symlink "#{prefix}/openresty/nginx/sbin/nginx"
-    bin.install_symlink "#{prefix}/openresty/bin/openresty"
-    bin.install_symlink "#{prefix}/openresty/bin/resty"
 
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
