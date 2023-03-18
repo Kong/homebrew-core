@@ -55,7 +55,7 @@ class Kong < Formula
 
   def install
 
-    tmpdir = "/var/tmp/kong-build.%f.%i" % [rand(), Time.now.to_i]
+    tmpdir = "%s/kong-build.%f.%i" % [ENV["HOMEBREW_TEMP"], rand(), Time.now.to_i]
     bazel = "bazel --output_user_root=#{tmpdir}/bazel"
 
     # Build kong, carefully setting the environment so that brew and bazel cooperate
@@ -79,7 +79,7 @@ class Kong < Formula
            "YAML_LIBDIR=#{yaml_libdir}",
            "YAML_INCDIR=#{yaml_incdir}"
 
-    system "#{bazel} --output_user_root=#{tmpdir}/bazel clean --expunge"
+    system "#{bazel} clean --expunge"
     system "#{bazel} shutdown"
     system "chmod", "-R", "u+w", "#{tmpdir}"
     system "rm -rf #{tmpdir}"
