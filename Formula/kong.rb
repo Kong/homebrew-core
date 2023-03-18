@@ -68,6 +68,33 @@ class Kong < Formula
     bin.install_symlink "#{prefix}/openresty/bin/resty"
     bin.install_symlink "#{prefix}/openresty/nginx/sbin/nginx"
 
+    $install_map = {}
+    Dir["#{prefix}/**/*.dylib"].each do |new_path|
+      $install_map[new_path.sub(/.*\//, '')] = new_path
+    end
+
+    def fix_executable(executable_path)
+      fixed = 0
+      `otool -L #{executable_path}`.scan(/(?<=\t)(.*)(?= \(.*\n)/) do |paths|
+        old_path = paths[0]
+        lib_name = old_path.sub(/.*\//, '')
+        new_path = $install_map[lib_name]
+        if new_path then
+          system "install_name_tool -change #{old_path} #{new_path} #{executable_path}"
+          fixed = fixed + 1
+        end
+      end
+      fixed
+    end
+
+    Dir["#{prefix}/**/*.dylib"].each do |new_path|
+      fix_executable(new_path)
+      system "codesign -sf - #{new_path}"
+    end
+    fix_executable("#{prefix}/bin/nginx")
+    fix_executable("#{prefix}/kong/bin/openssl")
+
+
     yaml_libdir = Formula["libyaml"].opt_lib
     yaml_incdir = Formula["libyaml"].opt_include
 
